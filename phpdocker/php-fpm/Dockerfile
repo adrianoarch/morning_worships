@@ -17,5 +17,12 @@ RUN apt-get update \
         php8.3-redis \
         php8.3-uuid \
         php8.3-xdebug \
+        php8.3-curl \
+        php8.3-xml \
+        php8.3-zip \
+        libcurl4-openssl-dev \
+        libssl-dev \
+        libxml2-dev \
+        libzip-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*

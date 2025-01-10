@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Models\MorningWorship;
+use App\Models\UserWatchedWorship;
 
 class User extends Authenticatable
 {
@@ -44,5 +46,17 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Adoracoes matinais assistidas pelo usuario.
+     *
+     * @return BelongsToMany<MorningWorship, User>
+     */
+    public function watchedWorships(): BelongsToMany
+    {
+        return $this->belongsToMany(MorningWorship::class, 'user_watched_worships')
+                    ->withTimestamps()
+                    ->withPivot('watched_at');
     }
 }
