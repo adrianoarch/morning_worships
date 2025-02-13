@@ -33,11 +33,11 @@ class MorningWorship extends Model
      *
      * @return BelongsToMany
      */
-    public function watchedByUsers() : BelongsToMany
+    public function watchedByUsers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_watched_worships')
-                    ->withPivot('watched_at')
-                    ->withTimestamps();
+            ->withPivot('watched_at')
+            ->withTimestamps();
     }
 
     // Método helper para verificar se um usuário específico já assistiu
@@ -47,5 +47,14 @@ class MorningWorship extends Model
             return false;
         }
         return $this->watchedByUsers()->where('user_id', $user->id)->exists();
+    }
+
+    public function scopeSearch($query, ?string $search)
+    {
+        if ($search) {
+            return $query->where('title', 'like', "%{$search}%");
+        }
+
+        return $query;
     }
 }

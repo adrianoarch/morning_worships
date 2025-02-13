@@ -56,7 +56,7 @@ class User extends Authenticatable
     public function watchedWorships(): BelongsToMany
     {
         return $this->belongsToMany(MorningWorship::class, 'user_watched_worships')
-                    ->withTimestamps()
-                    ->withPivot('watched_at');
+            ->withTimestamps()
+            ->withPivot('watched_at', 'notes');
     }
 }

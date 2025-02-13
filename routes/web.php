@@ -7,9 +7,9 @@ use App\Http\Controllers\WatchedWorshipController;
 use App\Http\Controllers\WorshipController;
 
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+Route::get('/', function () {
+    return redirect()->route('worships.index');
+})->name('home');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -28,7 +28,6 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/worship/mark-as-unwatched/{worship}', [WatchedWorshipController::class, 'markAsUnwatched'])
         ->name('worship.markAsUnwatched');
-
 });
 
 
