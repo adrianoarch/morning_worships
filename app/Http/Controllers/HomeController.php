@@ -35,7 +35,10 @@ class HomeController extends Controller
         }
 
         try {
-            $worships = $this->worshipService->getPaginatedWorships($request->search);
+            $worships = $this->worshipService->getPaginatedWorships(
+                $request->search,
+                $request->boolean('search_in_subtitles')
+            );
             $watchedWorshipsCount = $this->worshipService->getWatchedWorshipsCount();
 
             return view('worships.index', compact('worships', 'watchedWorshipsCount'));

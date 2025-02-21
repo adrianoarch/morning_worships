@@ -13,12 +13,25 @@ class WorshipService
      * If a search query is given, it will be used to filter the results.
      *
      * @param string|null $search
+     * @param bool $searchInSubtitles
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function getPaginatedWorships(?string $search = null): LengthAwarePaginator
-    {
-        return MorningWorship::search($search)
-            ->orderByDesc('first_published')
+    public function getPaginatedWorships(
+        ?string $search = null,
+        bool $searchInSubtitles = false
+    ): LengthAwarePaginator {
+        $query = MorningWorship::query();
+
+        if ($search) {
+            if ($searchInSubtitles) {
+                $query->whereRaw('MATCH (subtitles_text) AGAINST (? IN BOOLEAN MODE)', [$search]);
+            } else {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            }
+        }
+
+        return $query->orderByDesc('first_published')
             ->paginate(15);
     }
 
