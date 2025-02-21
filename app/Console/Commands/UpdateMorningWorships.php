@@ -3,11 +3,14 @@
 namespace App\Console\Commands;
 
 use App\Models\MorningWorship;
+use App\Traits\VttTextExtractor;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 
 class UpdateMorningWorships extends Command
 {
+    use VttTextExtractor;
+
     protected $signature = 'worships:update';
     protected $description = 'Atualiza a lista de adorações matinais do JW.org';
 
@@ -26,8 +29,9 @@ class UpdateMorningWorships extends Command
                 $image = $item['images']['lss']['lg'] ?? null;
                 $subtitle = $video720p['subtitles'] ?? null;
 
-                MorningWorship::updateOrCreate(
-                    ['guid' => $item['guid']], // Busca por esse campo
+                // Atualiza ou cria o registro
+                $morningWorship = MorningWorship::updateOrCreate(
+                    ['guid' => $item['guid']],
                     [
                         'title' => $item['title'],
                         'description' => $item['description'],
@@ -39,6 +43,22 @@ class UpdateMorningWorships extends Command
                         'subtitles' => $subtitle
                     ]
                 );
+
+                // Se houver legenda e ela possuir a URL, processa o conteúdo
+                if ($video720p && isset($video720p['subtitles']['url'])) {
+                    $subtitleUrl = $video720p['subtitles']['url'];
+
+                    try {
+                        $subResponse = Http::get($subtitleUrl);
+                        if ($subResponse->successful()) {
+                            $vttContent = $subResponse->body();
+                            $cleanText = $this->extractTextFromVtt($vttContent);
+                            $morningWorship->update(['subtitles_text' => $cleanText]);
+                        }
+                    } catch (\Exception $e) {
+                        $this->error("Erro ao processar legenda para {$item['guid']}: " . $e->getMessage());
+                    }
+                }
             }
 
             $this->info('Atualização concluída com sucesso!');

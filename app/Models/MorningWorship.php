@@ -19,6 +19,7 @@ class MorningWorship extends Model
         'video_url',
         'image_url',
         'subtitles',
+        'subtitles_text',
         'watched_at'
     ];
 
