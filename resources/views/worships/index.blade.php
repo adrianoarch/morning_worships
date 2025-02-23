@@ -5,55 +5,82 @@
         <h1 class="text-3xl font-bold mb-6 text-white">Adorações Matinais</h1>
 
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
-            <p class="text-lg text-gray-300 order-2 sm:order-1">
+            <!-- Texto de adorações assistidas -->
+            <p class="text-lg text-gray-300">
                 Adorações assistidas: <span id="watchedCount">{{ $watchedWorshipsCount }}</span> de {{ $worships->total() }}
             </p>
 
-            <form action="{{ route('worships.index') }}" method="GET" class="w-full sm:w-auto order-1 sm:order-2">
-                <div class="flex flex-col gap-2">
-                    <div class="flex gap-2">
-                        <div class="relative">
-                            <input type="text" name="search" value="{{ request('search') }}"
-                                placeholder="Buscar adoração..."
-                                class="w-full sm:w-64 pl-4 pr-10 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:border-blue-500 focus:ring-blue-500 focus:outline-none text-white"
-                                x-bind:placeholder="searchInSubtitles ? 'Buscar nas legendas...' : 'Buscar adoração...'">
-                            <div class="absolute right-0 top-0 h-full px-3 text-gray-400" x-show="isLoading">
-                                <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                        stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <button type="submit" x-show="!isLoading"
-                                class="absolute right-0 top-0 h-full px-3 text-gray-400 hover:text-white transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
+            <!-- Formulário de busca -->
+            <form
+                action="{{ route('worships.index') }}"
+                method="GET"
+                class="w-full sm:w-auto flex flex-col sm:flex-row sm:items-center sm:justify-end gap-6"
+                x-data="searchForm"
+                x-on:submit="submitForm"
+            >
+                <!-- Campo de busca (input + lupa/loading) -->
+                <div class="flex w-full sm:w-64 gap-2">
+                    <input
+                        type="text"
+                        name="search"
+                        x-model="searchQuery"
+                        class="flex-1 pl-4 py-2 rounded-lg bg-gray-700 border border-gray-600
+                               focus:border-blue-500 focus:ring-blue-500 focus:outline-none text-white
+                               placeholder-gray-400"
+                        x-bind:placeholder="searchInSubtitles ? 'Buscar nas legendas...' : 'Buscar adoração...'"
+                    >
 
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" name="search_in_subtitles" id="search_in_subtitles"
-                            x-model="searchInSubtitles"
-                            class="rounded bg-gray-700 border-gray-600 text-blue-500 focus:ring-blue-500"
-                            {{ request('search_in_subtitles') ? 'checked' : '' }}>
-                        <label for="search_in_subtitles" class="text-sm text-gray-300">
-                            Buscar no conteúdo das legendas
-                        </label>
-                    </div>
+                    <!-- Botão de busca (ícone de lupa) -->
+                    <button
+                        type="submit"
+                        class="px-2 py-2 rounded-lg bg-gray-700 border border-gray-600 text-gray-400
+                               hover:text-white hover:bg-gray-600 transition-colors duration-200"
+                        x-show="!isLoading"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            />
+                        </svg>
+                    </button>
                 </div>
+
+                <!-- Botão "Limpar" (destacado) -->
+                <button
+                    type="button"
+                    x-show="searchQuery"
+                    x-on:click="clearSearch"
+                    x-cloak
+                    class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                >
+                    Limpar
+                </button>
+
+                <!-- Checkbox "Buscar no conteúdo das legendas" -->
+                <label for="search_in_subtitles" class="flex items-center gap-2">
+                    <input
+                        type="checkbox"
+                        name="search_in_subtitles"
+                        id="search_in_subtitles"
+                        x-model="searchInSubtitles"
+                        class="rounded bg-gray-700 border-gray-600 text-blue-500 focus:ring-blue-500"
+                        {{ request('search_in_subtitles') ? 'checked' : '' }}
+                    >
+                    <span class="text-sm text-gray-300">Buscar no conteúdo das legendas</span>
+                </label>
             </form>
         </div>
+
+
+        @if ($worships->isEmpty())
+            <p class="text-lg text-gray-300">Nenhuma adoração encontrada.</p>
+        @endif
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach ($worships as $worship)
                 <div x-data="{ open: false }" :class="{ 'pointer-events-none': open }"
-                    class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                    class="bg-gray-700 p-6 rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
                     <!-- Imagem da capa -->
                     @if ($worship->image_url)
                         <img src="{{ $worship->image_url }}" alt="{{ $worship->title }}"
@@ -144,12 +171,25 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('searchForm', () => ({
                 isLoading: false,
+                // Valor atual do campo de busca
+                searchQuery: '{{ request('search') }}',
+                // Se está buscando nas legendas
                 searchInSubtitles: {{ request('search_in_subtitles') ? 'true' : 'false' }},
 
-                submitForm(event) {
+                submitForm() {
+                    // Ao submeter, mostra o spinner e deixa o form continuar
                     this.isLoading = true;
+                },
+
+                clearSearch() {
+                    // Se quiser apenas limpar o input:
+                    // this.searchQuery = '';
+
+                    // Ou, se quiser redirecionar para limpar completamente a busca (mais comum):
+                    window.location.href = "{{ route('worships.index') }}";
                 }
-            }))
-        })
+            }));
+        });
+
     </script>
 @endsection

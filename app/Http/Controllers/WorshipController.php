@@ -3,13 +3,60 @@
 namespace App\Http\Controllers;
 
 use App\Models\MorningWorship;
-use Illuminate\Http\Request;
+use App\Services\GeminiAIService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
 class WorshipController extends Controller
 {
-    public function show(MorningWorship $worship) : View
+    protected GeminiAIService $geminiAIService;
+
+    public function __construct(GeminiAIService $geminiAIService)
+    {
+        $this->geminiAIService = $geminiAIService;
+    }
+
+    /**
+     * Mostra a página de uma adoração individual.
+     *
+     * @param  MorningWorship  $worship
+     * @return View
+     */
+    public function show(MorningWorship $worship): View
     {
         return view('worships.show', compact('worship'));
+    }
+
+    /**
+     * Faz uma requisição para a API da Gemini AI para gerar um resumo conciso
+     * da adoração matinal, com base nas legendas fornecidas. O resumo é formatado
+     * em Markdown e destaca as lições principais em **negrito** e as frases
+     * marcantes em *itálico*.
+     *
+     * @param MorningWorship $worship Adoração matinal para gerar o resumo.
+     *
+     * @return JsonResponse Resposta em formato JSON com o resumo da adoração.
+     *                      Se houver erro, retorna um erro HTTP 400 ou 500 com
+     *                      uma mensagem de erro.
+     */
+    public function summarize(MorningWorship $worship): JsonResponse
+    {
+        $textToSummarize = $worship->subtitles_text;
+
+        if (empty($textToSummarize)) {
+            return response()->json(['error' => 'Legendas não encontradas para esta adoração.'], 400);
+        }
+
+        $prompt = "Com base no conteúdo fornecido, forneça um resumo conciso dessa Adoração Matinal das Testemunhas de Jeová, **formatado em Markdown**. Indique as lições principais em **negrito** e as frases marcantes em *itálico* dessa adoração.";
+
+        $truncatedText = $this->geminiAIService->truncateText($textToSummarize);
+
+        $summary = $this->geminiAIService->summarizeText($truncatedText, $prompt);
+
+        if ($summary) {
+            return response()->json(['summary' => trim($summary)]);
+        } else {
+            return response()->json(['error' => 'Erro ao gerar resumo com a IA.'], 500);
+        }
     }
 }

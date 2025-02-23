@@ -1,3 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+[x-cloak] {
+    display: none !important;
+}
+
+.summary-content {
+    line-height: 1.6;
+    font-size: 1rem;
+    color: #cbd5e0;
+}
+
+.summary-content strong {
+    color: #63b3ed;
+    font-weight: 600;
+}
+
+.loading-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}

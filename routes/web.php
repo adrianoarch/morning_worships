@@ -21,6 +21,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/worship/{worship}', [WorshipController::class, 'show'])->name('worship.show');
+    Route::post('/worships/{worship}/summarize', [WorshipController::class, 'summarize'])->name('worships.summarize');
+    
     Route::get('/worships', [HomeController::class, 'index'])->name('worships.index');
 
     Route::post('/worship/mark-as-watched/{worship}', [WatchedWorshipController::class, 'markAsWatched'])
