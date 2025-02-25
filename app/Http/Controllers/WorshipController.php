@@ -29,9 +29,7 @@ class WorshipController extends Controller
 
     /**
      * Faz uma requisição para a API da Gemini AI para gerar um resumo conciso
-     * da adoração matinal, com base nas legendas fornecidas. O resumo é formatado
-     * em Markdown e destaca as lições principais em **negrito** e as frases
-     * marcantes em *itálico*.
+     * da adoração matinal, com base nas legendas fornecidas.
      *
      * @param MorningWorship $worship Adoração matinal para gerar o resumo.
      *
@@ -42,12 +40,13 @@ class WorshipController extends Controller
     public function summarize(MorningWorship $worship): JsonResponse
     {
         $textToSummarize = $worship->subtitles_text;
+        $titleMorningWorship = $worship->title;
 
         if (empty($textToSummarize)) {
             return response()->json(['error' => 'Legendas não encontradas para esta adoração.'], 400);
         }
 
-        $prompt = "Com base no conteúdo fornecido, forneça um resumo conciso dessa Adoração Matinal das Testemunhas de Jeová, **formatado em Markdown**. Indique as lições principais em **negrito** e as frases marcantes em *itálico* dessa adoração.";
+        $prompt = 'Com base no conteúdo fornecido, forneça um resumo conciso dessa Adoração Matinal das Testemunhas de Jeová, **formatado em Markdown**. Inicie o resumo com o título da adoração ' . $titleMorningWorship . ', seguido de uma linha em branco. O título da adoração deve ser destacado em negrito. A estrutura do resumo deve ser a seguinte, depois do título: 1. Pequena introdução 2. Lições principais 3. Frases Marcantes. Os parágrafos devem ser formatados em Markdown. Separe as lições principais por ordenação númerica e identifique frases marcantes em *itálico* dessa adoração. Identifique e separe as lições principais das frases marcantes, com subtítulos.';
 
         $truncatedText = $this->geminiAIService->truncateText($textToSummarize);
 

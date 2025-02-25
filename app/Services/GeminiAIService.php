@@ -11,10 +11,12 @@ class GeminiAIService
 {
     protected Client $client;
 
-    public function __construct()
+    /**
+     * @param null|Client|\Mockery\LegacyMockInterface|\Mockery\MockInterface $client
+     */
+    public function __construct(?Client $client = null)
     {
-        $apiKey = config('services.gemini.api_key');
-        $this->client = new Client($apiKey);
+        $this->client = $client ?? new Client(config('services.gemini.api_key'));
     }
 
     /**

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2">
         <h1 class="text-3xl font-bold mb-6 text-white">Adorações Matinais</h1>
 
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
