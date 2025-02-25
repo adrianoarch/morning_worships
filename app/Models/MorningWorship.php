@@ -30,15 +30,15 @@ class MorningWorship extends Model
     ];
 
     /**
-     * Retorna a relação com os usuários que assistiram a essa adoração matinal.
+     * Usuários que assistiram esta adoração matinal.
      *
-     * @return BelongsToMany
+     * @return BelongsToMany<User, MorningWorship>
      */
     public function watchedByUsers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_watched_worships')
-            ->withPivot('watched_at')
-            ->withTimestamps();
+            ->withTimestamps()
+            ->withPivot('watched_at', 'notes');
     }
 
     // Método helper para verificar se um usuário específico já assistiu

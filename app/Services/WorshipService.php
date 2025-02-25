@@ -43,6 +43,8 @@ class WorshipService
      */
     public function getWatchedWorshipsCount(): int
     {
-        return Auth::user()->watchedWorships()->count();
+        return Auth::check()
+            ? Auth::user()->watchedWorships()->count()
+            : 0;
     }
 }
