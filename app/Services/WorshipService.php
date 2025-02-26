@@ -14,13 +14,21 @@ class WorshipService
      *
      * @param string|null $search
      * @param bool $searchInSubtitles
+     * @param bool $watchedOnly
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function getPaginatedWorships(
         ?string $search = null,
-        bool $searchInSubtitles = false
+        bool $searchInSubtitles = false,
+        bool $watchedOnly = false
     ): LengthAwarePaginator {
         $query = MorningWorship::query();
+
+        if ($watchedOnly) {
+            $query->whereHas('watchedByUsers', function ($query) {
+                $query->where('user_id', Auth::id());
+            });
+        }
 
         if ($search) {
             if ($searchInSubtitles) {
