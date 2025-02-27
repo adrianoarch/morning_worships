@@ -36,6 +36,7 @@ class HomeController extends Controller
 
         try {
             $watchedOnly = $request->boolean('watched');
+            // dd($watchedOnly);
             $worships = $this->worshipService->getPaginatedWorships(
                 $request->search,
                 $request->boolean('search_in_subtitles'),

@@ -11,6 +11,7 @@ class MorningWorship extends Model
 {
     protected $fillable = [
         'guid',
+        'natural_key',
         'title',
         'description',
         'first_published',
@@ -20,14 +21,17 @@ class MorningWorship extends Model
         'image_url',
         'subtitles',
         'subtitles_text',
-        'watched_at'
+        'watched_at',
     ];
 
     protected $casts = [
         'first_published' => 'datetime',
         'watched_at' => 'datetime',
-        'subtitles' => 'array'
+        'subtitles' => 'array',
+        'natural_key' => 'string',
     ];
+
+    protected $appends = ['video_url_jw'];
 
     /**
      * Usuários que assistiram esta adoração matinal.
@@ -57,5 +61,10 @@ class MorningWorship extends Model
         }
 
         return $query;
+    }
+
+    public function getVideoUrlJwAttribute()
+    {
+        return "https://www.jw.org/pt/biblioteca/videos/#pt/mediaitems/VODPgmEvtMorningWorship/{$this->natural_key}";
     }
 }

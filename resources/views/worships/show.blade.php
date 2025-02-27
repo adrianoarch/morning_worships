@@ -38,15 +38,25 @@
                 </button>
             </form>
 
-            <!-- Botão para abrir o modal e gerar resumo -->
-            <div class="mt-6">
-                <button id="summarize-button"
-                        onclick="openSummaryModal({{ $worship->id }})"
-                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out">
-                    Fornecer Resumo
-                </button>
+            <div class="flex">
+                <!-- Botão para abrir o modal e gerar resumo -->
+                <div class="mt-6 me-2">
+                    <button id="summarize-button"
+                            onclick="openSummaryModal({{ $worship->id }})"
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out">
+                        Fornecer Resumo
+                    </button>
+                </div>
 
+                {{-- Botão para copiar o link do video, baseado na propriedade video_url_jw --}}
+                <button
+                    class="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out"
+                    onclick="copyToClipboard(event, '{{ $worship->video_url_jw }}')">
+                    Copiar link do vídeo
+                </button>
             </div>
+
+
         </div>
     </div>
 
@@ -84,6 +94,55 @@
             } catch (error) {
                 console.error('Erro:', error);
             }
+        }
+
+        function copyToClipboard(event, text) {
+            text = String(text);
+            const button = event.target; // Pega a referência correta do botão
+
+            // Tenta usar a API moderna primeiro
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showFeedback(button);
+                }).catch(err => {
+                    fallbackCopy(text, button);
+                });
+            } else {
+                fallbackCopy(text, button);
+            }
+        }
+
+        // Função auxiliar para mostrar feedback visual
+        function showFeedback(button) {
+            const originalText = button.textContent;
+            const originalClasses = button.className;
+
+            button.textContent = 'Copiado!';
+            button.className = originalClasses.replace('bg-blue-500', 'bg-green-500');
+
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.className = originalClasses;
+            }, 2000);
+        }
+
+        // Fallback para navegadores antigos
+        function fallbackCopy(text, button) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                document.execCommand('copy');
+                showFeedback(button);
+            } catch (err) {
+                alert('Não foi possível copiar. Tente manualmente (Ctrl+C):\n' + text);
+            }
+
+            document.body.removeChild(textArea);
         }
     </script>
 @endsection

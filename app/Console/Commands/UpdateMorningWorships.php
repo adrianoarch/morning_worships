@@ -33,6 +33,7 @@ class UpdateMorningWorships extends Command
                 $morningWorship = MorningWorship::updateOrCreate(
                     ['guid' => $item['guid']],
                     [
+                        'natural_key' => $item['languageAgnosticNaturalKey'],
                         'title' => $item['title'],
                         'description' => $item['description'],
                         'first_published' => $item['firstPublished'],

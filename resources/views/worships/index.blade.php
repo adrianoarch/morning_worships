@@ -14,8 +14,14 @@
             <form action="{{ route('worships.index') }}" method="GET"
                 class="w-full sm:w-auto flex flex-col sm:flex-row sm:items-center sm:justify-end gap-6"
                 x-data="searchForm" x-on:submit="submitForm">
-                <input type="hidden" name="watched" value="1">
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                <input type="hidden"
+                        id="watched"
+                        name="watched"
+                        x-model="watched"
+                >
+                <button type="submit"
+                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                        @click="watched = true">
                     Exibir adorações assistidas
                 </button>
                 <!-- Campo de busca (input + lupa/loading) -->
@@ -40,9 +46,9 @@
 
                 <!-- Botão "Limpar" (destacado) -->
                 <button type="button"
-                    x-show="searchQuery ||
-                        {{ request('watched') ? 'true' : 'false' }}"
+                    x-show="searchQuery || watched"
                     x-on:click="clearSearch" x-cloak
+                    @click="watched = false"
                     class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
                     Limpar
                 </button>
@@ -158,6 +164,7 @@
                 isLoading: false,
                 searchQuery: '{{ request('search') }}',
                 searchInSubtitles: {{ request('search_in_subtitles') ? 'true' : 'false' }},
+                watched: {{ request('watched') === 'true' ? 'true' : 'false' }},
 
                 submitForm() {
                     this.isLoading = true;
