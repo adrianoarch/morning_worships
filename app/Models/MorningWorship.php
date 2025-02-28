@@ -65,6 +65,6 @@ class MorningWorship extends Model
 
     public function getVideoUrlJwAttribute()
     {
-        return "https://www.jw.org/pt/biblioteca/videos/#pt/mediaitems/VODPgmEvtMorningWorship/{$this->natural_key}";
+        return "https://www.jw.org/finder?srcid=share&wtlocale=T&lank={$this->natural_key}";
     }
 }
