@@ -50,11 +50,20 @@ class UpdateMorningWorships extends Command
                     $subtitleUrl = $video720p['subtitles']['url'];
 
                     try {
-                        $subResponse = Http::get($subtitleUrl);
+                        // Configure HTTP client with proper timeouts and retries
+                        $subResponse = Http::timeout(30)
+                            ->retry(3, 1000) // 3 retries with 1 second delay
+                            ->withHeaders([
+                                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                            ])
+                            ->get($subtitleUrl);
+                            
                         if ($subResponse->successful()) {
                             $vttContent = $subResponse->body();
                             $cleanText = $this->extractTextFromVtt($vttContent);
                             $morningWorship->update(['subtitles_text' => $cleanText]);
+                        } else {
+                            $this->warn("Falha ao baixar legenda para {$item['guid']}: HTTP {$subResponse->status()}");
                         }
                     } catch (\Exception $e) {
                         $this->error("Erro ao processar legenda para {$item['guid']}: " . $e->getMessage());

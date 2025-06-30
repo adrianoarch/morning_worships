@@ -37,14 +37,21 @@ class UpdateSubtitlesText extends Command
                 $subtitleUrl = $subtitlesData['url'];
 
                 try {
-                    $response = Http::get($subtitleUrl);
+                    // Configure HTTP client with proper timeouts and retries
+                    $response = Http::timeout(30)
+                        ->retry(3, 1000) // 3 retries with 1 second delay
+                        ->withHeaders([
+                            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                        ])
+                        ->get($subtitleUrl);
+                        
                     if ($response->successful()) {
                         $vttContent = $response->body();
                         $cleanText = $this->extractTextFromVtt($vttContent);
                         $worship->update(['subtitles_text' => $cleanText]);
                         $this->info("Registro {$worship->id} atualizado com sucesso.");
                     } else {
-                        $this->error("Falha ao baixar legenda para registro {$worship->id}.");
+                        $this->error("Falha ao baixar legenda para registro {$worship->id}: HTTP {$response->status()}");
                     }
                 } catch (\Exception $e) {
                     $this->error("Erro no registro {$worship->id}: " . $e->getMessage());

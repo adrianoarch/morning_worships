@@ -36,7 +36,7 @@ class GeminiAIService
             // dd($listModels);
 
             $response = $this->client
-                ->generativeModel(ModelName::GEMINI_2_0_FLASH)
+                ->generativeModel(ModelName::GEMINI_2_5_PRO_EXP)
                 ->generateContent(
                     new TextPart($fullPrompt),
                 );
@@ -57,7 +57,7 @@ class GeminiAIService
      *
      * @return string The truncated text.
      */
-    public function truncateText(string $text, int $limit = 6500): string
+    public function truncateText(string $text, int $limit = 15000): string
     {
         if (strlen($text) <= $limit) {
             return $text;
