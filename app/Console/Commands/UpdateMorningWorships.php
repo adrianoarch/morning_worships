@@ -3,9 +3,12 @@
 namespace App\Console\Commands;
 
 use App\Models\MorningWorship;
+use App\Models\User;
+use App\Notifications\NewWorshipNotification;
 use App\Traits\VttTextExtractor;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Notification;
 
 class UpdateMorningWorships extends Command
 {
@@ -44,6 +47,12 @@ class UpdateMorningWorships extends Command
                         'subtitles' => $subtitle
                     ]
                 );
+
+                if ($morningWorship->wasRecentlyCreated) {
+                    $this->info("Nova adoração encontrada: {$morningWorship->title}");
+                    $usersToNotify = User::where('receives_email_notification', true)->get();
+                    Notification::send($usersToNotify, new NewWorshipNotification($morningWorship));
+                }
 
                 // Se houver legenda e ela possuir a URL, processa o conteúdo
                 if ($video720p && isset($video720p['subtitles']['url'])) {

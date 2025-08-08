@@ -47,6 +47,13 @@
             @endif
         </div>
 
+        <div class="block mt-4">
+            <label for="receives_email_notification" class="inline-flex items-center">
+                <input id="receives_email_notification" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="receives_email_notification" value="1" @checked(old('receives_email_notification', $user->receives_email_notification))>
+                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Desejo receber notificações por email sobre novas adorações.') }}</span>
+            </label>
+        </div>
+
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 

@@ -10,8 +10,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote')->hourly();
 
 Schedule::command(UpdateMorningWorships::class)
-    ->twiceDaily(8, 20) // Executa às 8h e 20h
-    // ->everyMinute()
-    ->withoutOverlapping()
-    ->runInBackground(); // Evita execuções simultâneas
-    // ->appendOutputTo(storage_path('logs/scheduler.log')); // Registra logs de execução
+    ->everyTwoHours() // Executa a cada 2 horas
+    ->withoutOverlapping() // Evita execuções simultâneas
+    ->runInBackground() // Executa em background
+    ->appendOutputTo(storage_path('logs/scheduler.log')); // Registra logs de execução

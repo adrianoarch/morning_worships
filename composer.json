@@ -9,7 +9,8 @@
         "gemini-api-php/client": "^1.7",
         "google/cloud-ai-platform": "^1.18",
         "laravel/framework": "^11.9",
-        "laravel/tinker": "^2.9"
+        "laravel/tinker": "^2.9",
+        "mailersend/laravel-driver": "^2.11"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.5",
