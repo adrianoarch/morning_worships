@@ -13,7 +13,25 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form
+        method="post"
+        action="{{ route('profile.update') }}"
+        class="mt-6 space-y-6"
+        x-data="{
+            formatBRPhone(v){
+                const d=(v||'').replace(/\D+/g,'').slice(0,11);
+                if(d.length<=2) return `(${d}`;
+                if(d.length<=6) return `(${d.slice(0,2)}) ${d.slice(2)}`;
+                if(d.length<=10) return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;
+                return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7,11)}`; // 11 dígitos
+            },
+            digitsOnly(v){ return (v||'').replace(/\D+/g,''); },
+            init(){
+                const el=this.$refs.phone; if(el && el.value){ el.value=this.formatBRPhone(el.value); }
+            }
+        }"
+        @submit.prevent="$refs.phone.value = digitsOnly($refs.phone.value); $el.submit()"
+    >
         @csrf
         @method('patch')
 
@@ -45,6 +63,45 @@
                     @endif
                 </div>
             @endif
+        </div>
+
+        <div>
+            <x-input-label for="phone" :value="__('Telefone')" />
+            <x-text-input id="phone" x-ref="phone" name="phone" type="text" class="mt-1 block w-full" :value="old('phone', $user->phone)" autocomplete="tel-national" placeholder="(11) 99999-9999" @input="$event.target.value = formatBRPhone($event.target.value)" />
+            <x-input-error class="mt-2" :messages="$errors->get('phone')" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <x-input-label for="timezone" :value="__('Fuso horário')" />
+                <select id="timezone" name="timezone" class="mt-1 block w-full rounded-md dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    @php
+                        $timezones = [
+                            'America/Sao_Paulo' => 'America/Sao_Paulo',
+                            'America/Bahia' => 'America/Bahia',
+                            'America/Manaus' => 'America/Manaus',
+                            'America/Recife' => 'America/Recife',
+                            'UTC' => 'UTC',
+                        ];
+                        $tzValue = old('timezone', $user->timezone ?? config('app.timezone'));
+                    @endphp
+                    @foreach($timezones as $tz => $label)
+                        <option value="{{ $tz }}" @selected($tzValue === $tz)>{{ $label }}</option>
+                    @endforeach
+                </select>
+                <x-input-error class="mt-2" :messages="$errors->get('timezone')" />
+            </div>
+
+            <div>
+                <x-input-label for="language" :value="__('Idioma')" />
+                @php($langValue = old('language', $user->language ?? config('app.locale')))
+                <select id="language" name="language" class="mt-1 block w-full rounded-md dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="pt-BR" @selected($langValue === 'pt-BR')>Português (Brasil)</option>
+                    <option value="en" @selected($langValue === 'en')>English</option>
+                    <option value="es" @selected($langValue === 'es')>Español</option>
+                </select>
+                <x-input-error class="mt-2" :messages="$errors->get('language')" />
+            </div>
         </div>
 
         <div class="block mt-4">

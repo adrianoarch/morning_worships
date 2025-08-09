@@ -26,6 +26,34 @@ class ProfileUpdateRequest extends FormRequest
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
             'receives_email_notification' => ['nullable', 'boolean'],
+            'phone' => [
+                'nullable',
+                'string',
+                'min:11',
+                'max:15',
+            ],
+            'timezone' => ['nullable', 'timezone'],
+            'language' => ['nullable', 'string', 'max:10'],
+        ];
+    }
+
+    /**
+     * Implement the authorize method to allow the request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'phone.min' => 'O telefone deve conter pelo menos 11 números.',
         ];
     }
 }

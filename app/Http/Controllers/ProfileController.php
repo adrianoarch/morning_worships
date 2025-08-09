@@ -29,6 +29,12 @@ class ProfileController extends Controller
         $validatedData = $request->validated();
         $validatedData['receives_email_notification'] = $request->has('receives_email_notification');
 
+        // Sanitize phone to store only digits (or null if empty)
+        if (array_key_exists('phone', $validatedData)) {
+            $digits = preg_replace('/\D+/', '', (string) ($validatedData['phone'] ?? ''));
+            $validatedData['phone'] = $digits !== '' ? $digits : null;
+        }
+
         $request->user()->fill($validatedData);
 
         if ($request->user()->isDirty('email')) {

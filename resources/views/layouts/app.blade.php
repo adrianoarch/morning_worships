@@ -35,6 +35,7 @@
 
         <!-- Page Content -->
         <main class="bg-gray-900">
+            @include('layouts.partials.flash')
             @yield('content')
         </main>
     </div>

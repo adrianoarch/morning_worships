@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Notifications\VerifyEmailQueued;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\MorningWorship;
 use App\Models\UserWatchedWorship;
@@ -24,7 +25,18 @@ class User extends Authenticatable
         'email',
         'password',
         'receives_email_notification',
+        'phone',
+        'timezone',
+        'language',
     ];
+
+    /**
+     * Send the email verification notification via queue.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify((new VerifyEmailQueued())->onQueue('mail'));
+    }
 
     /**
      * The attributes that should be hidden for serialization.
