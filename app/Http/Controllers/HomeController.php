@@ -34,7 +34,6 @@ class HomeController extends Controller
             abort(403, 'Você precisa estar logado para acessar essa página.');
         }
 
-        // dd($request->all());
         try {
             $watchedOnly = $request->boolean('watched');
             $worships = $this->worshipService->getPaginatedWorships(
@@ -42,10 +41,14 @@ class HomeController extends Controller
                 $request->boolean('search_in_subtitles'),
                 $watchedOnly
             );
-
             $watchedWorshipsCount = $this->worshipService->getWatchedWorshipsCount();
+            $firstWorshipId = $this->worshipService->getFirstWorshipId(
+                $request->search,
+                $request->boolean('search_in_subtitles'),
+                $watchedOnly
+            );
 
-            return view('worships.index', compact('worships', 'watchedWorshipsCount'));
+            return view('worships.index', compact('worships', 'watchedWorshipsCount', 'firstWorshipId'));
         } catch (\Exception $e) {
             report($e);
             abort(500, 'Erro ao recuperar as adorações. Tente novamente mais tarde.');
