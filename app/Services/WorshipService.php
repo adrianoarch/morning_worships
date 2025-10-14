@@ -39,7 +39,8 @@ class WorshipService
             }
         }
 
-        return $query->orderByDesc('first_published')
+        return $query
+            ->orderByDesc('first_published')
             ->paginate(15);
     }
 

@@ -114,7 +114,7 @@
 
         <!-- Paginação -->
         <div class="mt-8 pb-2">
-            {{ $worships->links() }}
+            {{ $worships->appends(request()->query())->links() }}
         </div>
     </div>
 
