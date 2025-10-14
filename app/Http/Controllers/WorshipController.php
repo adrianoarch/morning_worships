@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\MorningWorship;
 use App\Services\GeminiAIService;
+use App\Services\WorshipService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class WorshipController extends Controller
@@ -22,9 +24,22 @@ class WorshipController extends Controller
      * @param  MorningWorship  $worship
      * @return View
      */
-    public function show(MorningWorship $worship): View
+    public function show(Request $request, MorningWorship $worship, WorshipService $worshipService): View
     {
-        return view('worships.show', compact('worship'));
+        $playlist = $request->boolean('playlist');
+        $search = $request->input('search');
+        $searchInSubtitles = $request->boolean('search_in_subtitles');
+        $watchedOnly = $request->boolean('watched');
+
+        $nextWorshipId = null;
+        $firstWorshipId = null;
+
+        if ($playlist) {
+            $nextWorshipId = $worshipService->getNextWorshipId($worship, $search, $searchInSubtitles, $watchedOnly);
+            $firstWorshipId = $worshipService->getFirstWorshipId($search, $searchInSubtitles, $watchedOnly);
+        }
+
+        return view('worships.show', compact('worship', 'playlist', 'nextWorshipId', 'firstWorshipId'));
     }
 
     /**
