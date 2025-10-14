@@ -26,6 +26,17 @@
                     Exibir adorações assistidas
                 </button>
 
+                @php
+                    $playlistQuery = array_merge(request()->query(), ['playlist' => 1]);
+                @endphp
+                <a
+                    href="{{ $firstWorshipId ? route('worship.show', array_merge(['worship' => $firstWorshipId], $playlistQuery)) : '#' }}"
+                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50 disabled:pointer-events-none text-center"
+                    @class(['pointer-events-none opacity-50' => !$firstWorshipId])
+                >
+                    Assistir todos
+                </a>
+
                 <!-- Campo de busca (input + lupa/loading) -->
                 <div class="flex w-full sm:w-64 gap-2">
                     <input type="text" name="search" x-model="searchQuery" @keydown.enter.prevent="submitForm"
