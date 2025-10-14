@@ -34,14 +34,15 @@ class HomeController extends Controller
             abort(403, 'Você precisa estar logado para acessar essa página.');
         }
 
+        // dd($request->all());
         try {
             $watchedOnly = $request->boolean('watched');
-            // dd($watchedOnly);
             $worships = $this->worshipService->getPaginatedWorships(
                 $request->search,
                 $request->boolean('search_in_subtitles'),
                 $watchedOnly
             );
+
             $watchedWorshipsCount = $this->worshipService->getWatchedWorshipsCount();
 
             return view('worships.index', compact('worships', 'watchedWorshipsCount'));

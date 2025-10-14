@@ -13,20 +13,22 @@
             <!-- Formulário de busca -->
             <form action="{{ route('worships.index') }}" method="GET"
                 class="w-full sm:w-auto flex flex-col sm:flex-row sm:items-center sm:justify-end gap-6"
-                x-data="searchForm" x-on:submit="submitForm">
+                x-data="searchForm" x-on:submit.prevent="submitForm" x-ref="searchForm">
                 <input type="hidden"
                         id="watched"
                         name="watched"
-                        x-model="watched"
+                        x-model.number="watched"
                 >
-                <button type="submit"
+                <button type="button"
                         class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                        @click="watched = true">
+                        :class="{ 'bg-blue-700': watched }"
+                        @click="watched = true; submitForm()">
                     Exibir adorações assistidas
                 </button>
+
                 <!-- Campo de busca (input + lupa/loading) -->
                 <div class="flex w-full sm:w-64 gap-2">
-                    <input type="text" name="search" x-model="searchQuery"
+                    <input type="text" name="search" x-model="searchQuery" @keydown.enter.prevent="submitForm"
                         class="flex-1 pl-4 py-2 rounded-lg bg-gray-700 border border-gray-600
                                focus:border-blue-500 focus:ring-blue-500 focus:outline-none text-white
                                placeholder-gray-400"
@@ -245,17 +247,33 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('searchForm', () => ({
                 isLoading: false,
-                searchQuery: '{{ request('search') }}',
-                searchInSubtitles: {{ request('search_in_subtitles') ? 'true' : 'false' }},
-                watched: {{ request('watched') === 'true' ? 'true' : 'false' }},
+                searchQuery: '{{ request('search', '') }}',
+                searchInSubtitles: {{ request('search_in_subtitles', 'false') === 'true' ? 'true' : 'false' }},
+                watched: {{ request('watched', 'false') === 'true' ? 'true' : 'false' }},
 
                 submitForm() {
                     this.isLoading = true;
+                    // Aguarda o flush do x-model (p.ex., watched=true) antes de submeter
+                    this.$nextTick(() => {
+                        this.$refs.searchForm.submit();
+                    });
                 },
 
                 clearSearch() {
-                    // Redireciona para a rota sem parâmetros de pesquisa
-                    window.location.href = "{{ route('worships.index') }}";
+                    this.searchQuery = '';
+                    this.searchInSubtitles = false;
+                    this.watched = false;
+                    // Remove os parâmetros da URL sem recarregar a página
+                    window.history.pushState({}, '', window.location.pathname);
+                    // Recarrega a página sem os parâmetros
+                    window.location.reload();
+                },
+
+                // Previnir ação do botão de enter para não recarregar a página
+                preventEnter(event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                    }
                 }
             }));
         });
