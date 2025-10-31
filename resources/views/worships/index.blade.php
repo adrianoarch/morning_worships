@@ -172,7 +172,7 @@
             }());
 
             const congratsMessage = document.createElement('div');
-            congratsMessage.innerHTML = '<h2>Parabéns! 🎉</h2><p>Você completou mais uma adoração matinal, danadinha!</p>';
+            congratsMessage.innerHTML = '<h2>Parabéns! 🎉</h2><p>Você completou mais uma adoração matinal!</p>';
             congratsMessage.style.cssText = `
                 position: fixed;
                 top: 50%;

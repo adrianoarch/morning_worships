@@ -36,7 +36,7 @@ class GeminiAIService
             // dd($listModels);
 
             $response = $this->client
-                ->generativeModel(ModelName::GEMINI_2_5_PRO_EXP)
+                ->generativeModel(ModelName::GEMINI_2_5_FLASH)
                 ->generateContent(
                     new TextPart($fullPrompt),
                 );

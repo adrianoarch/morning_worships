@@ -109,12 +109,23 @@ class WorshipService
 
 
     /**
-     * Get the count of MorningWorships watched by the currently authenticated user.
-     *
-     * @return int
+     * Get the count of MorningWorships watched by the currently authenticated user,
+     * restricted to the current filters (search, subtitles, watchedOnly).
      */
-    public function getWatchedWorshipsCount(): int
-    {
-        return Auth::user()?->watchedWorships()->count() ?? 0;
+    public function getWatchedWorshipsCount(
+        ?string $search = null,
+        bool $searchInSubtitles = false,
+        bool $watchedOnly = false
+    ): int {
+        if (!Auth::check()) {
+            return 0;
+        }
+
+        $query = $this->buildFilteredQuery($search, $searchInSubtitles, $watchedOnly);
+
+        // Count only items from the filtered set that are watched by the current user
+        return $query->whereHas('watchedByUsers', function ($q) {
+            $q->where('user_id', Auth::id());
+        })->count();
     }
 }

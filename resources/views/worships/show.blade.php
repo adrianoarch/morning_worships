@@ -16,42 +16,29 @@
 
             <!-- Vídeo -->
             <div class="relative">
-                <video
-                    id="worshipVideo"
-                    controls
-                    class="w-full mb-4"
-                    poster="{{ $worship->image_url }}"
-                    preload="metadata"
-                    playsinline
-                    webkit-playsinline
-                    {{ !empty($playlist) && $playlist ? 'autoplay' : '' }}
-                >
-                <source src="{{ $worship->video_url }}" type="video/mp4">
-                @if ($worship->subtitles)
-                    <track
-                        kind="subtitles"
-                        src="{{ $worship->subtitles['url'] }}"
-                        srclang="pt"
-                        label="Português"
-                        default
-                    >
-                @endif
-                Seu navegador não suporta a reprodução de vídeos.
+                <video id="worshipVideo" controls class="w-full mb-4" poster="{{ $worship->image_url }}" preload="metadata"
+                    playsinline webkit-playsinline {{ !empty($playlist) && $playlist ? 'autoplay' : '' }}>
+                    <source src="{{ $worship->video_url }}" type="video/mp4">
+                    @if ($worship->subtitles)
+                        <track kind="subtitles" src="{{ $worship->subtitles['url'] }}" srclang="pt" label="Português"
+                            default>
+                    @endif
+                    Seu navegador não suporta a reprodução de vídeos.
                 </video>
 
                 <!-- Overlay para iniciar em dispositivos que bloqueiam autoplay -->
-                <div id="tapToStartOverlay" class="hidden absolute inset-0 flex items-center justify-center bg-black/60 rounded">
-                    <button
-                        class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded"
-                        type="button"
-                    >
+                <div id="tapToStartOverlay"
+                    class="hidden absolute inset-0 flex items-center justify-center bg-black/60 rounded">
+                    <button class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded"
+                        type="button">
                         Tocar para iniciar
                     </button>
                 </div>
 
                 <!-- Overlay para ativar som quando em playlist -->
                 <div id="unmuteOverlay" class="hidden absolute top-2 right-2">
-                    <button type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-sm py-1 px-3 rounded shadow">
+                    <button type="button"
+                        class="bg-blue-600 hover:bg-blue-700 text-white text-sm py-1 px-3 rounded shadow">
                         Ativar som
                     </button>
                 </div>
@@ -61,6 +48,7 @@
             <form id="markAsWatchedForm-{{ $worship->id }}">
                 @csrf
                 <button type="button" onclick="markAsWatched({{ $worship->id }})"
+                    id="markAsWatchedButton-{{ $worship->id }}"
                     class="text-sm {{ $worship->wasWatchedBy(Auth::user()) ? 'text-green-500' : 'text-gray-300 hover:text-gray-400' }}">
                     {{ $worship->wasWatchedBy(Auth::user()) ? '✔ Assistida' : 'Marcar como assistida' }}
                 </button>
@@ -69,9 +57,8 @@
             <div class="flex">
                 <!-- Botão para abrir o modal e gerar resumo -->
                 <div class="mt-6 me-2">
-                    <button id="summarize-button"
-                            onclick="openSummaryModal({{ $worship->id }})"
-                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out">
+                    <button id="summarize-button" onclick="openSummaryModal({{ $worship->id }})"
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out">
                         Fornecer Resumo
                     </button>
                 </div>
@@ -93,21 +80,33 @@
     <script>
         const isPlaylist = {{ !empty($playlist) && $playlist ? 'true' : 'false' }};
         const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-        const nextUrlBase = {!! json_encode(isset($nextWorshipId) && $nextWorshipId ? route('worship.show', ['worship' => $nextWorshipId]) : null) !!};
-        const firstUrlBase = {!! json_encode(isset($firstWorshipId) && $firstWorshipId ? route('worship.show', ['worship' => $firstWorshipId]) : null) !!};
+        const nextUrlBase = {!! json_encode(
+            isset($nextWorshipId) && $nextWorshipId ? route('worship.show', ['worship' => $nextWorshipId]) : null,
+        ) !!};
+        const firstUrlBase = {!! json_encode(
+            isset($firstWorshipId) && $firstWorshipId ? route('worship.show', ['worship' => $firstWorshipId]) : null,
+        ) !!};
 
         const videoEl = document.getElementById('worshipVideo');
         const tapOverlay = document.getElementById('tapToStartOverlay');
         const unmuteOverlay = document.getElementById('unmuteOverlay');
+        const markAsWatchedButton = document.getElementById('markAsWatchedButton-{{ $worship->id }}');
 
-        function show(el) { el.classList.remove('hidden'); }
-        function hide(el) { el.classList.add('hidden'); }
+        function show(el) {
+            el.classList.remove('hidden');
+        }
+
+        function hide(el) {
+            el.classList.add('hidden');
+        }
 
         // Tentar iniciar reprodução automaticamente quando em playlist
         if (isPlaylist && videoEl) {
             // No iOS exigimos muted para autoplay; nos demais mantemos som
             videoEl.muted = !!isIOS;
-            const tryPlay = () => videoEl.play().catch(() => { if (isIOS) show(tapOverlay); });
+            const tryPlay = () => videoEl.play().catch(() => {
+                if (isIOS) show(tapOverlay);
+            });
 
             if (document.readyState === 'complete' || document.readyState === 'interactive') {
                 tryPlay();
@@ -135,7 +134,8 @@
 
             // Exibir "Ativar som" apenas no iOS quando estiver muted
             videoEl.addEventListener('playing', () => {
-                if (isIOS && videoEl.muted) show(unmuteOverlay); else hide(unmuteOverlay);
+                if (isIOS && videoEl.muted) show(unmuteOverlay);
+                else hide(unmuteOverlay);
             });
             // Avançar automaticamente ao término, preservando a query string
             videoEl.addEventListener('ended', () => {
@@ -172,16 +172,14 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    const button = form.querySelector('button');
-                    if (data.action === 'marked') {
-                        button.textContent = '✔ Assistida';
-                        button.classList.remove('text-gray-300', 'hover:text-gray-400');
-                        button.classList.add('text-green-500');
-                    } else {
-                        button.textContent = 'Marcar como assistida';
-                        button.classList.remove('text-green-500');
-                        button.classList.add('text-gray-300', 'hover:text-gray-400');
-                    }
+                    markAsWatchedButton.textContent = data.action === 'marked' ?
+                        '✔ Assistida' :
+                        'Marcar como assistida';
+
+                    markAsWatchedButton.classList.toggle('text-green-500', data.action === 'marked');
+                    markAsWatchedButton.classList.toggle('text-gray-300', data.action !== 'marked');
+
+                    triggerCelebration();
                 }
             } catch (error) {
                 console.error('Erro:', error);

@@ -41,7 +41,11 @@ class HomeController extends Controller
                 $request->boolean('search_in_subtitles'),
                 $watchedOnly
             );
-            $watchedWorshipsCount = $this->worshipService->getWatchedWorshipsCount();
+            $watchedWorshipsCount = $this->worshipService->getWatchedWorshipsCount(
+                $request->search,
+                $request->boolean('search_in_subtitles'),
+                $watchedOnly
+            );
             $firstWorshipId = $this->worshipService->getFirstWorshipId(
                 $request->search,
                 $request->boolean('search_in_subtitles'),
