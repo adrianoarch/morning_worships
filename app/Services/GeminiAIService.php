@@ -20,7 +20,7 @@ class GeminiAIService
     }
 
     /**
-     * Summarize a given text using Gemini's 2.0 Flash model.
+     * Summarize a given text using Gemini's 3.0 Preview model.
      *
      * @param string $text The text to summarize.
      * @param string $prompt A prompt to guide the summarization process.
@@ -36,7 +36,7 @@ class GeminiAIService
             // dd($listModels);
 
             $response = $this->client
-                ->generativeModel(ModelName::GEMINI_2_5_FLASH)
+                ->generativeModel(ModelName::GEMINI_3_0_PREVIEW)
                 ->generateContent(
                     new TextPart($fullPrompt),
                 );

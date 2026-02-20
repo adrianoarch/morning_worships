@@ -36,20 +36,24 @@ class HomeController extends Controller
 
         try {
             $watchedOnly = $request->boolean('watched');
+            $exactPhrase = $request->boolean('exact_phrase');
             $worships = $this->worshipService->getPaginatedWorships(
                 $request->search,
                 $request->boolean('search_in_subtitles'),
-                $watchedOnly
+                $watchedOnly,
+                $exactPhrase
             );
             $watchedWorshipsCount = $this->worshipService->getWatchedWorshipsCount(
                 $request->search,
                 $request->boolean('search_in_subtitles'),
-                $watchedOnly
+                $watchedOnly,
+                $exactPhrase
             );
             $firstWorshipId = $this->worshipService->getFirstWorshipId(
                 $request->search,
                 $request->boolean('search_in_subtitles'),
-                $watchedOnly
+                $watchedOnly,
+                $exactPhrase
             );
 
             return view('worships.index', compact('worships', 'watchedWorshipsCount', 'firstWorshipId'));

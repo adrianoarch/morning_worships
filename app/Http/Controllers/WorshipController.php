@@ -30,13 +30,14 @@ class WorshipController extends Controller
         $search = $request->input('search');
         $searchInSubtitles = $request->boolean('search_in_subtitles');
         $watchedOnly = $request->boolean('watched');
+        $exactPhrase = $request->boolean('exact_phrase');
 
         $nextWorshipId = null;
         $firstWorshipId = null;
 
         if ($playlist) {
-            $nextWorshipId = $worshipService->getNextWorshipId($worship, $search, $searchInSubtitles, $watchedOnly);
-            $firstWorshipId = $worshipService->getFirstWorshipId($search, $searchInSubtitles, $watchedOnly);
+            $nextWorshipId = $worshipService->getNextWorshipId($worship, $search, $searchInSubtitles, $watchedOnly, $exactPhrase);
+            $firstWorshipId = $worshipService->getFirstWorshipId($search, $searchInSubtitles, $watchedOnly, $exactPhrase);
         }
 
         return view('worships.show', compact('worship', 'playlist', 'nextWorshipId', 'firstWorshipId'));

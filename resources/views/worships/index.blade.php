@@ -14,26 +14,18 @@
             <form action="{{ route('worships.index') }}" method="GET"
                 class="w-full sm:w-auto flex flex-col sm:flex-row sm:items-center sm:justify-end gap-6"
                 x-data="searchForm" x-on:submit.prevent="submitForm" x-ref="searchForm">
-                <input type="hidden"
-                        id="watched"
-                        name="watched"
-                        x-model.number="watched"
-                >
-                <button type="button"
-                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                        :class="{ 'bg-blue-700': watched }"
-                        @click="watched = true; submitForm()">
+                <input type="hidden" id="watched" name="watched" x-model.number="watched">
+                <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    :class="{ 'bg-blue-700': watched }" @click="watched = true; submitForm()">
                     Exibir adorações assistidas
                 </button>
 
                 @php
                     $playlistQuery = array_merge(request()->query(), ['playlist' => 1]);
                 @endphp
-                <a
-                    href="{{ $firstWorshipId ? route('worship.show', array_merge(['worship' => $firstWorshipId], $playlistQuery)) : '#' }}"
+                <a href="{{ $firstWorshipId ? route('worship.show', array_merge(['worship' => $firstWorshipId], $playlistQuery)) : '#' }}"
                     class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50 disabled:pointer-events-none text-center"
-                    @class(['pointer-events-none opacity-50' => !$firstWorshipId])
-                >
+                    @class(['pointer-events-none opacity-50' => !$firstWorshipId])>
                     Assistir todos
                 </a>
 
@@ -58,9 +50,7 @@
                 </div>
 
                 <!-- Botão "Limpar" (destacado) -->
-                <button type="button"
-                    x-show="searchQuery || watched"
-                    x-on:click="clearSearch" x-cloak
+                <button type="button" x-show="searchQuery || watched" x-on:click="clearSearch" x-cloak
                     @click="watched = false"
                     class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
                     Limpar
@@ -72,6 +62,14 @@
                         class="rounded bg-gray-700 border-gray-600 text-blue-500 focus:ring-blue-500"
                         {{ request('search_in_subtitles') ? 'checked' : '' }}>
                     <span class="text-sm text-gray-300">Buscar no conteúdo das legendas</span>
+                </label>
+
+                <!-- Checkbox "Busca exata" (só aparece quando busca nas legendas está ativa) -->
+                <label for="exact_phrase" class="flex items-center gap-2" x-show="searchInSubtitles" x-cloak>
+                    <input type="checkbox" name="exact_phrase" id="exact_phrase" x-model="exactPhrase"
+                        class="rounded bg-gray-700 border-gray-600 text-blue-500 focus:ring-blue-500"
+                        {{ request('exact_phrase') ? 'checked' : '' }}>
+                    <span class="text-sm text-gray-300">Busca exata (frase completa)</span>
                 </label>
             </form>
         </div>
@@ -144,7 +142,9 @@
                     particleCount: 7,
                     angle: 60,
                     spread: 55,
-                    origin: { x: 0 },
+                    origin: {
+                        x: 0
+                    },
                     colors: colors
                 });
 
@@ -152,7 +152,9 @@
                     particleCount: 7,
                     angle: 120,
                     spread: 55,
-                    origin: { x: 1 },
+                    origin: {
+                        x: 1
+                    },
                     colors: colors
                 });
 
@@ -161,7 +163,10 @@
                     particleCount: 10,
                     angle: 90,
                     spread: 100,
-                    origin: { y: 0, x: 0.5 },
+                    origin: {
+                        y: 0,
+                        x: 0.5
+                    },
                     colors: colors
                 });
 
@@ -261,6 +266,7 @@
                 searchQuery: '{{ request('search', '') }}',
                 searchInSubtitles: {{ request('search_in_subtitles', 'false') === 'true' ? 'true' : 'false' }},
                 watched: {{ request('watched', 'false') === 'true' ? 'true' : 'false' }},
+                exactPhrase: {{ request('exact_phrase', 'false') === 'true' ? 'true' : 'false' }},
 
                 submitForm() {
                     this.isLoading = true;
@@ -274,6 +280,7 @@
                     this.searchQuery = '';
                     this.searchInSubtitles = false;
                     this.watched = false;
+                    this.exactPhrase = false;
                     // Remove os parâmetros da URL sem recarregar a página
                     window.history.pushState({}, '', window.location.pathname);
                     // Recarrega a página sem os parâmetros
