@@ -54,12 +54,19 @@
                 </button>
             </form>
 
-            <div class="flex">
+            <div class="flex flex-wrap gap-2">
                 <!-- Botão para abrir o modal e gerar resumo -->
-                <div class="mt-6 me-2">
+                <div class="mt-6">
                     <button id="summarize-button" onclick="openSummaryModal({{ $worship->id }})"
                         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out">
                         Fornecer Resumo
+                    </button>
+                </div>
+
+                <div class="mt-6">
+                    <button id="generate-drawing-button" onclick="openDrawingModal({{ $worship->id }})"
+                        class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out">
+                        🎨 Gerar Desenho
                     </button>
                 </div>
 
@@ -76,6 +83,7 @@
     </div>
 
     @include('worships.partials.summary-modal')
+    @include('worships.partials.drawing-modal')
 
     <script>
         const isPlaylist = {{ !empty($playlist) && $playlist ? 'true' : 'false' }};

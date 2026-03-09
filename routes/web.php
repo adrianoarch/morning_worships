@@ -23,6 +23,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/worship/{worship}', [WorshipController::class, 'show'])->name('worship.show');
     Route::post('/worships/{worship}/summarize', [WorshipController::class, 'summarize'])->name('worships.summarize');
+    Route::post('/worships/{worship}/generate-drawing', [WorshipController::class, 'generateDrawing'])->name('worships.generateDrawing');
 
     Route::get('/worships', [HomeController::class, 'index'])->name('worships.index');
 
